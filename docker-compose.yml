@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: sales-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sales
+      POSTGRES_USER: sales_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - sales_pgdata:/var/lib/postgresql/data
+    shm_size: 128mb
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sales_admin -d sales"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sales_pgdata:
