@@ -10,6 +10,7 @@ import { z } from "zod";
 import { createPool } from "./db.js";
 import { registerLeadTools } from "./tools/leads.js";
 import { registerLeadReadTools } from "./tools/leads_read.js";
+import { registerOutreachTools } from "./tools/outreach.js";
 
 const HOST = "127.0.0.1";
 const PORT = 3100;
@@ -58,6 +59,7 @@ function buildServer(db: Pool): McpServer {
 
   registerLeadTools(server, db);
   registerLeadReadTools(server, db);
+  registerOutreachTools(server, db);
   return server;
 }
 
