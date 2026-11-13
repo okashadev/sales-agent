@@ -2,3 +2,10 @@
 node_modules/
 dist/
 operator.env
+*.sql.gpg
+*.sql.gz
+*.dump
+*.partial
+sales-backups/
+exports/
+data/
