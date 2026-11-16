@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { dbErrorMessage, toolError, toolJson, withTx } from "../dbutil.js";
+import { lintDraft } from "../lint.js";
 
 const WRITE = {
   readOnlyHint: false,
@@ -149,6 +150,12 @@ export function registerOutreachTools(server: McpServer, pool: Pool): void {
         return toolError("An initial email must use sequence_step 0.");
       if (a.kind === "follow_up" && a.sequence_step < 1)
         return toolError("A follow_up must use sequence_step 1 or higher.");
+      const lint = lintDraft(a.subject, a.body);
+      if (!lint.ok) {
+        return toolError(
+          `Draft rejected by content rules: ${lint.problems.join("; ")}. Rewrite it plainly without these and try again. Do not add a signature or any links; those are added later.`,
+        );
+      }
       try {
         const out = await withTx(pool, async (c) => {
           const r = await c.query<{
